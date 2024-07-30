@@ -4,7 +4,7 @@
 
 ;; Author: Kyle Belleau <kylejbelleau@gmail.com>
 ;; URL: https://github.com/kbelleau/notif
-;; Package-Requires (emacs "24.1") (yasnippet "0.10.0")
+;; Package-Requires (emacs "26.1") (yasnippet "0.10.0")
 ;; Keywords: notes
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 (require 'yasnippet)
 
 (defgroup notif nil
-  "notif --- A quick note creation method")
+  "notif --- A quick, customizable note creation method")
 
 (defcustom notif-directory
   (concat (getenv "HOME") "/" "notes" "/")
@@ -102,15 +102,21 @@
       (org-mode)
       (yas-expand-snippet (yas-lookup-snippet notif-snippet)))))
 
+(defun notif-read-note ()
+  "Opens `find-file-read-only' inside of your `notif-directory'."
+  (interactive)
+  (let ((default-directory notif-directory))
+    (call-interactively 'find-file-read-only)))
+
 (defun notif-find-todo ()
   "Opens your `notif' todo note."
   (interactive)
   (when notif-todo-enable
-      (let ((default-directory notif-directory))
-        (find-file notif-todo-note-name)
-        (unless (file-exists-p buffer-file-name)
-          (org-mode)
-          (yas-expand-snippet (yas-lookup-snippet notif-todo-snippet))))))
+    (let ((default-directory notif-directory))
+      (find-file notif-todo-note-name)
+      (unless (file-exists-p buffer-file-name)
+        (org-mode)
+        (yas-expand-snippet (yas-lookup-snippet notif-todo-snippet))))))
 
 (defun notif-find-notepad ()
   "Opens your `notif' notepad note."
