@@ -33,7 +33,9 @@
 (require 'yasnippet)
 
 (defgroup notif nil
-  "notif --- A quick, customizable note creation method")
+  "notif --- A quick, customizable note creation method."
+  :group 'convenience
+  :link '(url-link "https://github.com/kbelleau/notif"))
 
 (defcustom notif-directory
   (concat (getenv "HOME") "/" "notes" "/")
@@ -43,7 +45,7 @@
 
 (defcustom notif-snippet
   "notif"
-  "Name of your `YASnippet' template used by 'notif'."
+  "Name of your `YASnippet' template used by `notif'."
   :type 'string
   :group 'notif)
 
