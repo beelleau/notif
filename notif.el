@@ -87,6 +87,10 @@
   "Opens `find-file' inside of your `notif-directory'."
   t)
 
+(autoload 'notif-read-note "notif"
+  "Opens `find-file-read-only' inside of your `notif-directory'."
+  t)
+
 (autoload 'notif-find-todo "notif"
   "Opens your `notif' todo note."
   t)
