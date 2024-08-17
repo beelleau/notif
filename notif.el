@@ -76,28 +76,8 @@
   (concat notif-directory "Tickets/")
   "Location of Tickets in `notif-directory'.")
 
-;; autoloads
-(autoload 'notif-find-note "notif"
-  "Opens `find-file' inside of your `notif-directory'."
-  t)
-
-(autoload 'notif-read-note "notif"
-  "Opens `find-file-read-only' inside of your `notif-directory'."
-  t)
-
-(autoload 'notif-find-ticket "notif"
-  "Opens `find-file' inside of your `notif-ticket-directory'."
-  t)
-
-(autoload 'notif-find-todo "notif"
-  "Opens your `notif' todo note."
-  t)
-
-(autoload 'notif-find-notepad "notif"
-  "Opens your `notif' notepad note."
-  t)
-
-;; functions
+;; user-facing functions
+;;;###autoload
 (defun notif-find-note ()
   "Opens `find-file' inside of your `notif-directory'."
   (interactive)
@@ -107,12 +87,14 @@
       (org-mode)
       (yas-expand-snippet (yas-lookup-snippet notif-snippet)))))
 
+;;;###autoload
 (defun notif-read-note ()
   "Opens `find-file-read-only' inside of your `notif-directory'."
   (interactive)
   (let ((default-directory notif-directory))
     (call-interactively 'find-file-read-only)))
 
+;;;###autoload
 (defun notif-find-ticket ()
   "Opens `find-file' inside of your `notif-ticket-directory'."
   (interactive)
@@ -122,6 +104,7 @@
       (org-mode)
       (yas-expand-snippet (yas-lookup-snippet notif-ticket-snippet)))))
 
+;;;###autoload
 (defun notif-find-todo ()
   "Opens your `notif' todo note."
   (interactive)
@@ -131,6 +114,7 @@
       (org-mode)
       (yas-expand-snippet (yas-lookup-snippet notif-todo-snippet)))))
 
+;;;###autoload
 (defun notif-find-notepad ()
   "Opens your `notif' notepad note."
   (interactive)
