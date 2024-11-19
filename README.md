@@ -1,12 +1,12 @@
 # notif.el
-notif is a quick, configurable note creation system to help you organize your notes in GNU Emacs.
+notif is a quick, configurable note creation system to help you create notes in GNU Emacs.  
 
 `notif.el` depends on the Emacs extension `yasnippet`, found in the ELPA repository. You can read more about YASnippet [here](https://joaotavora.github.io/yasnippet).  
 
-It uses Emacs' org-mode (other options may be available in the future).
+It uses Emacs' org-mode for note files.
 
 ## Installation
-To install notif, please follow these instructions.
+To install notif, please follow these instructions.  
 
 Clone this repository:  
 ``` sh
@@ -27,15 +27,15 @@ Ensure your path is enabled in `load-path` and load `notif`:
 ```
 
 ## Usage
-`notif-find-note`: this function is a wrapper around Emacs' `find-file`. It will open the `find-file` prompt inside of your `{notif-directory}`. With this function, you can open existing notes, or create new ones. When a new note is created, it will automatically expand your `notif-snippet` in the buffer.  
+`notif-find-note`: this function is a modified version of Emacs' `find-file`. It will open the minibuffer prompt inside of your `NOTIF-DIRECTORY`. With this function, you can open existing notes, or create new ones. When a new note is created, it will automatically expand your `notif-note-snippet` in the buffer.  
 
-`notif-read-note`: this function is a wrapper around Emacs' `find-file-read-only`. It will open the `find-file-read-only` prompt inside of your `notif-directory`. With this function, you can open existing notes in read-only.  
+`notif-find-note-read-only`: this function is a modified version of Emacs' `find-file-read-only`. It will open the minibuffer prompt inside of your `notif-directory`. With this function, you can open existing notes in read-only mode.  
 
-`notif-find-ticket`: this function is a wrapper around Emacs' `find-file`. It will open the `find-file` prompt inside the patch `{notif-directory}/Tickets/`. With this function, you can open existing tickets, or create new ones. When a new ticket is created, it will automatically expand your `notif-ticket-snippet` the buffer.  
+`notif-find-ticket`: this function utilizes `notif-find-note`. It will open the minibuffer prompt inside the path `NOTIF-DIRECTORY/Tickets/`. With this function, you can open existing tickets, or create new ones. When a new ticket is created, it will automatically expand your `notif-ticket-snippet` in the buffer.  
 
-`notif-find-todo`: this function utilizes Emacs' `find-file` to open your notif TODO file. It is located at: `{notif-directory}/TODO`. If this file does not already exist, it will be created, and your `notif-todo-snippet` will be  automatically expanded in the buffer.  
+`notif-find-todo`: this function utilizes `notif-find-file` to open your notif TODO file. It is located at: `NOTIF-DIRECTORY/TODO`. If this file does not already exist, it will be created, and your `notif-todo-snippet` will be  automatically expanded in the buffer.  
 
-`notif-find-notepad`: this function utilizes Emacs' `find-file` to open your notif Notepad file. It is located at: `{notif-directory}/Notepad`. If this file does not already exist, it will be created, and your `notif-snippet` will be automatically expanded in the buffer.  
+`notif-find-notepad`: this function utilizes Emacs' `find-file` to open your notif Notepad file. It is located at: `NOTIF-DIRECTORY/Notepad`. If this file does not already exist, it will be created, and your `notif-note-snippet` will be automatically expanded in the buffer.  
 
 Call the notif functions as appropriate. Use keybindings, or call the functions with `M-x <function>`
 
@@ -50,8 +50,8 @@ Create a snippet for a default note template. Here, you can create whatever you 
 View my snippet template for some ideas:  
 ```yasnippet
 # -*- mode: snippet -*-
-# name: notif
-# key: -notif
+# name: notif-note
+# key: -notif-note
 # --
 
 # -*- mode: org -*-
@@ -71,28 +71,29 @@ The first is the `notif-directory`. By default, it's configured to: `~/notes/`. 
 ```elisp
 (setq notif-directory "/path/to/your/notif-directory/")
 ```
+_keep the trailing slash_  
 
-Additionally, you'll want to setup a `notif-snippet`. This value is the name of your snippet that you want to automatically expand each time you create a new note. By default, it is set to `notif`, but you can change this value by adding the following to your `init.el`:  
+Additionally, you'll want to setup a `notif-note-snippet`. This value is the name of your snippet that you want to automatically expand each time you create a new note. By default, it is set to `notif-note`, but you can change this value by adding the following to your `init.el`:  
 ```elisp
-(setq notif-snippet "snippet-name")
+(setq notif-note-snippet "snippet-name")
 ```
 
-You can state the YASnippet name to be used with `notif-find-ticket`. This value is the name of the snippet that you want to automatically expand each time you create a new ticket. By default, it is set to `notif-ticket`, but you can change this value by adding the following to your `init.el`:  
+You can state the YASnippet name to be used with `notif-find-ticket`, named `notif-ticket-snippet`. This value is the name of the snippet that you want to automatically expand each time you create a new ticket. By default, it is set to `notif-ticket`, but you can change this value by adding the following to your `init.el`:  
 ```elisp
 (setq notif-ticket-snippet "snippet-name")
 ```
 
-You can state the YASnippet name to be used with `notif-find-todo` (used if the file does not already exist). By default, it is configured to `notif-todo`. You can change like so:  
+You can state the YASnippet name to be used with `notif-find-todo`, named `notif-todo-snippet`. This value is the name of the snippet that you want to automatically expand each time you create a new TODO file. By default, it is set to `notif-ticket`, but you can change this value by adding the following to your `init.el`:  
 ```elisp
 (setq notif-todo-snippet "snippet-name")
 ```
 
 ### Keybindings
-There are a few functions you'll likely want to configure keybindings for. It is not required, of course.
+There are a few functions you'll likely want to configure keybindings for. It is not required, of course.  
 
 Functions:  
 `notif-find-note`  
-`notif-read-note`  
+`notif-find-note-read-only`  
 `notif-find-ticket`  
 `notif-find-todo`  
 `notif-find-notepad`  
@@ -107,9 +108,9 @@ There are multiple ways to configure keybindings in Emacs. This is how I do it:
 
   ;; notif functions
   (define-key map (kbd "C-c n") notif-prefix-map)
-  (define-key map (kbd "C-c n n") #'notif-find-note)
+  (define-key map (kbd "C-c n f") #'notif-find-note)
   (define-key map (kbd "C-c n r") #'notif-read-note)
   (define-key map (kbd "C-c n i") #'notif-find-ticket)
   (define-key map (kbd "C-c n t") #'notif-find-todo)
-  (define-key map (kbd "C-c n s") #'notif-find-notepad))
+  (define-key map (kbd "C-c n n") #'notif-find-notepad))
 ```

@@ -30,7 +30,6 @@
 ;; own organizational procedure.
 
 ;;; Code:
-
 (require 'yasnippet)
 
 (defgroup notif nil
@@ -40,89 +39,119 @@
 
 ;; customizable variables
 (defcustom notif-directory
-  (concat (getenv "HOME") "/" "notes" "/")
+  (file-name-as-directory (concat (getenv "HOME") "/" "notes"))
   "Path to the user's notif-managed notes directory."
   :type 'directory
   :group 'notif)
 
-(defcustom notif-snippet
-  "notif"
-  "Name of your `YASnippet' template used by `notif'."
+(defcustom notif-note-snippet
+  "notif-note"
+  "The name of your `YASnippet' snippet used by `notif' for notes."
   :type 'string
   :group 'notif)
 
 (defcustom notif-ticket-snippet
   "notif-ticket"
-  "Name of your `YASnippet' ticket template used by `notif'."
+  "The name of your `YASnippet' snippet used by `notif' for tickets."
   :type 'string
   :group 'notif)
 
 (defcustom notif-todo-snippet
   "notif-todo"
-  "Name of your `YASnippet' todo template used by `notif'."
+  "The name of your `YASnippet' todo template used by `notif' for the TODO."
   :type 'string
   :group 'notif)
 
-;; static variables
-(defvar notif-todo-note-name
-  "TODO"
-  "Name of your `notif' TODO note.")
-
-(defvar notif-notepad-note-name
-  "Notepad"
-  "Name of your `notif' Notepad note.")
-
-(defvar notif-ticket-directory
-  (concat notif-directory "Tickets/")
-  "Location of Tickets in `notif-directory'.")
+;; internal function
+(defun notif--new-buffer (snippet)
+  "Actions to run in a new notif note buffer."
+  (org-mode)
+  (yas-expand-snippet (yas-lookup-snippet snippet)))
 
 ;; user-facing functions
 ;;;###autoload
-(defun notif-find-note ()
-  "Opens `find-file' inside of your `notif-directory'."
-  (interactive)
-  (let ((default-directory notif-directory))
-    (call-interactively 'find-file)
-    (unless (file-exists-p buffer-file-name)
-      (org-mode)
-      (yas-expand-snippet (yas-lookup-snippet notif-snippet)))))
+(defun notif-find-note (notename &optional wildcards snippet)
+  "Edit the NOTENAME.
+Switches to a buffer named NOTENAME, or creates it if it doesn't exist.
+Interactively, the default location is the current directory.
+`notif-find-note' is essentially a modified `find-file'. View
+`find-file' for more information."
+
+  (interactive
+   (let ((default-directory
+          (if (string-prefix-p (expand-file-name notif-directory)
+                               (expand-file-name default-directory))
+              default-directory
+            notif-directory)))
+
+     (let ((args (find-file-read-args "Find note: "
+                                      (confirm-nonexistent-file-or-buffer))))
+       (list (car args) nil notif-note-snippet))))
+
+  (let ((value (find-file-noselect notename nil nil wildcards)))
+    (if (listp value)
+        (mapcar 'pop-to-buffer-same-window (nreverse value))
+      (pop-to-buffer-same-window value))
+    ;; run find-file hooks
+    (if (not (file-exists-p notename))
+        (progn
+          (run-hooks 'find-file-not-found-functions)
+          (notif--new-buffer (or snippet notif-note-snippet)))
+      (run-hooks 'find-file-hook))))
 
 ;;;###autoload
-(defun notif-read-note ()
-  "Opens `find-file-read-only' inside of your `notif-directory'."
-  (interactive)
-  (let ((default-directory notif-directory))
-    (call-interactively 'find-file-read-only)))
+(defun notif-find-note-read-only (notename &optional wildcards)
+  "Edit file NOTENAME but don't allow changes.
+`notif-find-note' is essentially a modified `find-file-read-only'. View
+`find-file-read-only' for more information."
+
+  (interactive
+   (find-file-read-args "Find note read-only: "
+                        (confirm-nonexistent-file-or-buffer)))
+  (find-file--read-only #'find-file notename wildcards))
 
 ;;;###autoload
-(defun notif-find-ticket ()
-  "Opens `find-file' inside of your `notif-ticket-directory'."
-  (interactive)
-  (let ((default-directory notif-ticket-directory))
-    (call-interactively 'find-file)
-    (unless (file-exists-p buffer-file-name)
-      (org-mode)
-      (yas-expand-snippet (yas-lookup-snippet notif-ticket-snippet)))))
+(defun notif-find-ticket (ticketname &optional wildcards)
+  "Edit a Ticket with the name TICKETNAME.
+Switches to a buffer named TICKETNAME in the Tickets directory,
+or creates it if it doesn't exist."
+
+  (interactive
+   (let ((default-directory
+          (expand-file-name "Tickets/" notif-directory)))
+     (find-file-read-args "Find ticket: "
+                          (confirm-nonexistent-file-or-buffer))))
+
+  (notif-find-note
+   (concat
+    (file-name-as-directory (expand-file-name "Tickets/" notif-directory))
+    ticketname)
+   wildcards notif-ticket-snippet))
 
 ;;;###autoload
 (defun notif-find-todo ()
-  "Opens your `notif' todo note."
+  "Edit the TODO note.
+Switches to a buffer named TODO in the `notif-directory',
+or creates it if it doesn't exist."
+
   (interactive)
-  (let ((default-directory notif-directory))
-    (find-file notif-todo-note-name)
-    (unless (file-exists-p buffer-file-name)
-      (org-mode)
-      (yas-expand-snippet (yas-lookup-snippet notif-todo-snippet)))))
+  (let ((todo-path (concat
+                    (file-name-as-directory notif-directory)
+                    "TODO")))
+    ;; create the TODO note if it doesn't exist
+    (notif-find-note todo-path nil notif-todo-snippet)))
 
 ;;;###autoload
 (defun notif-find-notepad ()
-  "Opens your `notif' notepad note."
+  "Edit the Notepad note.
+Switches to a buffer named Notepad in the `notif-directory',
+or creates it if it doesn't exist."
   (interactive)
-  (let ((default-directory notif-directory))
-    (find-file notif-notepad-note-name)
-    (unless (file-exists-p buffer-file-name)
-      (org-mode)
-      (yas-expand-snippet (yas-lookup-snippet notif-snippet)))))
+  (let ((notepad-path (concat
+                       (file-name-as-directory notif-directory)
+                       "Notepad")))
+    ;; create the Notepad note if it doesn't exist
+    (notif-find-note notepad-path)))
 
 (provide 'notif)
 ;;; notif.el ends here
