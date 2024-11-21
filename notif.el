@@ -7,6 +7,8 @@
 ;; Package-Requires (emacs "26.1") (yasnippet "0.10.0")
 ;; Keywords: notes
 
+;; This file is NOT part of GNU Emacs.
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
