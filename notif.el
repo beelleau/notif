@@ -3,7 +3,7 @@
 ;; Copyright (C) 2024 Kyle Belleau
 
 ;; Author: Kyle Belleau <kylejbelleau@gmail.com>
-;; URL: https://github.com/kbelleau/notif
+;; URL: https://github.com/beelleau/notif
 ;; Package-Requires (emacs "26.1") (yasnippet "0.10.0")
 ;; Keywords: notes
 
@@ -37,7 +37,7 @@
 (defgroup notif nil
   "notif --- A quick, customizable note creation method."
   :group 'convenience
-  :link '(url-link "https://github.com/kbelleau/notif"))
+  :link '(url-link "https://github.com/beelleau/notif"))
 
 ;; customizable variables
 (defcustom notif-directory

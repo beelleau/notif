@@ -10,7 +10,7 @@ To install notif, please follow these instructions.
 
 Clone this repository:  
 ``` sh
-git clone https://github.com/kbelleau/notif.git
+git clone https://github.com/beelleau/notif.git
 ```
 
 Either symlink or copy `notif.el` into a path that gets loaded in your `init.el`. I typically use a symlink:  
