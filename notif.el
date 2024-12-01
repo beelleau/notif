@@ -1,4 +1,4 @@
-;;; notif.el --- A quick, customizable note creation method -*- lexical-binding: t -*-
+;;; notif.el --- Quick & customizable note creation tool for GNU Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Kyle Belleau
 
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; notif.el helps streamline quick note creation and organization in
+;; `notif' helps streamline quick note creation and organization in
 ;; a customizable method, acting as a wrapper around existing Emacs utilities.
 ;; It relies on the YASnippet package, which can be found in the
 ;; the ELPA repository. You can create your own YASnippet template for
@@ -35,7 +35,7 @@
 (require 'yasnippet)
 
 (defgroup notif nil
-  "notif --- A quick, customizable note creation method."
+  "notif --- A quick, customizable note creation tool for Emacs."
   :group 'convenience
   :link '(url-link "https://github.com/beelleau/notif"))
 
@@ -70,7 +70,7 @@
   (org-mode)
   (yas-expand-snippet (yas-lookup-snippet snippet)))
 
-;; user-facing functions
+;; interactive functions
 ;;;###autoload
 (defun notif-find-note (notename &optional wildcards snippet)
   "Edit the NOTENAME.
@@ -78,7 +78,6 @@ Switches to a buffer named NOTENAME, or creates it if it doesn't exist.
 Interactively, the default location is the current directory.
 `notif-find-note' is essentially a modified `find-file'. View
 `find-file' for more information."
-
   (interactive
    (let ((default-directory
           (if (string-prefix-p (expand-file-name notif-directory)
@@ -92,7 +91,7 @@ Interactively, the default location is the current directory.
 
   (let ((value (find-file-noselect notename nil nil wildcards)))
     (if (listp value)
-        (mapcar 'pop-to-buffer-same-window (nreverse value))
+        (mapc 'pop-to-buffer-same-window (nreverse value))
       (pop-to-buffer-same-window value))
     ;; run find-file hooks
     (if (not (file-exists-p notename))
@@ -106,7 +105,6 @@ Interactively, the default location is the current directory.
   "Edit file NOTENAME but don't allow changes.
 `notif-find-note' is essentially a modified `find-file-read-only'. View
 `find-file-read-only' for more information."
-
   (interactive
    (find-file-read-args "Find note read-only: "
                         (confirm-nonexistent-file-or-buffer)))
@@ -117,7 +115,6 @@ Interactively, the default location is the current directory.
   "Edit a Ticket with the name TICKETNAME.
 Switches to a buffer named TICKETNAME in the Tickets directory,
 or creates it if it doesn't exist."
-
   (interactive
    (let ((default-directory
           (expand-file-name "Tickets/" notif-directory)))
@@ -135,7 +132,6 @@ or creates it if it doesn't exist."
   "Edit the TODO note.
 Switches to a buffer named TODO in the `notif-directory',
 or creates it if it doesn't exist."
-
   (interactive)
   (let ((todo-path (concat
                     (file-name-as-directory notif-directory)
