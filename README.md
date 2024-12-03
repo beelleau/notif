@@ -69,7 +69,7 @@ There are several settings to configure to use notif.
 
 The first is the `notif-directory`. By default, it's configured to: `~/notes/`. However, you can change this value by adding the following to your `init.el`:  
 ```elisp
-(setq notif-directory "/path/to/your/notif-directory/")
+(setq notif-directory "/path/to/your/notes/dir")
 ```
 _keep the trailing slash_  
 

@@ -41,7 +41,7 @@
 
 ;; customizable variables
 (defcustom notif-directory
-  (file-name-as-directory (concat (getenv "HOME") "/" "notes"))
+  (expand-file-name "~/notes")
   "Path to the user's notif-managed notes directory."
   :type 'directory
   :group 'notif)
@@ -51,7 +51,6 @@
   "The name of your `YASnippet' snippet used by `notif' for notes."
   :type 'string
   :group 'notif)
-
 (defcustom notif-ticket-snippet
   "notif-ticket"
   "The name of your `YASnippet' snippet used by `notif' for tickets."
@@ -63,6 +62,10 @@
   "The name of your `YASnippet' todo template used by `notif' for the TODO."
   :type 'string
   :group 'notif)
+
+(defvar notif-directory-p
+  (file-name-as-directory notif-directory)
+  "Ensure notif-directory has a trailing slash.")
 
 ;; internal function
 (defun notif--new-buffer (snippet)
@@ -80,10 +83,10 @@ Interactively, the default location is the current directory.
 `find-file' for more information."
   (interactive
    (let ((default-directory
-          (if (string-prefix-p (expand-file-name notif-directory)
+          (if (string-prefix-p (expand-file-name notif-directory-p)
                                (expand-file-name default-directory))
               default-directory
-            notif-directory)))
+            notif-directory-p)))
 
      (let ((args (find-file-read-args "Find note: "
                                       (confirm-nonexistent-file-or-buffer))))
@@ -116,16 +119,16 @@ Interactively, the default location is the current directory.
 Switches to a buffer named TICKETNAME in the Tickets directory,
 or creates it if it doesn't exist."
   (interactive
-   (let ((default-directory
-          (expand-file-name "Tickets/" notif-directory)))
+   (let* ((tickets-dir (expand-file-name "Tickets/" notif-directory-p))
+          (default-directory tickets-dir))
      (find-file-read-args "Find ticket: "
                           (confirm-nonexistent-file-or-buffer))))
 
-  (notif-find-note
-   (concat
-    (file-name-as-directory (expand-file-name "Tickets/" notif-directory))
-    ticketname)
-   wildcards notif-ticket-snippet))
+  (let ((ticket-path (expand-file-name
+                      ticketname
+                      (expand-file-name
+                       "Tickets/" notif-directory-p))))
+    (notif-find-note ticket-path wildcards notif-ticket-snippet)))
 
 ;;;###autoload
 (defun notif-find-todo ()
@@ -133,9 +136,7 @@ or creates it if it doesn't exist."
 Switches to a buffer named TODO in the `notif-directory',
 or creates it if it doesn't exist."
   (interactive)
-  (let ((todo-path (concat
-                    (file-name-as-directory notif-directory)
-                    "TODO")))
+  (let ((todo-path (concat notif-directory-p "TODO")))
     ;; create the TODO note if it doesn't exist
     (notif-find-note todo-path nil notif-todo-snippet)))
 
@@ -145,9 +146,7 @@ or creates it if it doesn't exist."
 Switches to a buffer named Notepad in the `notif-directory',
 or creates it if it doesn't exist."
   (interactive)
-  (let ((notepad-path (concat
-                       (file-name-as-directory notif-directory)
-                       "Notepad")))
+  (let ((notepad-path (concat notif-directory-p "Notepad")))
     ;; create the Notepad note if it doesn't exist
     (notif-find-note notepad-path)))
 
