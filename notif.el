@@ -106,11 +106,16 @@ Interactively, the default location is the current directory.
 ;;;###autoload
 (defun notif-find-note-read-only (notename &optional wildcards)
   "Edit file NOTENAME but don't allow changes.
-`notif-find-note' is essentially a modified `find-file-read-only'. View
-`find-file-read-only' for more information."
+`notif-find-note-read-onyl' is essentially a modified `find-file-read-only'.
+View `find-file-read-only' for more information."
   (interactive
-   (find-file-read-args "Find note read-only: "
-                        (confirm-nonexistent-file-or-buffer)))
+   (let ((default-directory
+          (if (string-prefix-p (expand-file-name notif-directory-p)
+                               (expand-file-name default-directory))
+              default-directory
+            notif-directory-p)))
+     (find-file-read-args "Find note read-only: "
+                          (confirm-nonexistent-file-or-buffer))))
   (find-file--read-only #'find-file notename wildcards))
 
 ;;;###autoload
